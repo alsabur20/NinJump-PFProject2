@@ -29,9 +29,13 @@ void loadingScreen(char loadingPageCharacter[16][45]);
 void moveRightSnake(char snakeRight[4][3], int rightSnakeX[], int rightSnakeY[], int &rightSnakeCount, bool &isShieldActive, int &hit, int mazeYMax);
 void moveLeftSnake(char snakeLeft[4][3], int leftSnakeX[], int leftSnakeY[], int &leftSnakeCount, bool &isShieldActive, int &hit, int mazeYMax);
 void generateLeftSnake(char snakeLeft[4][3], int leftSnakeX[], int leftSnakeY[], int &leftSnakeCount, int lSnakeX, int lSnakeY);
+void deleteLeftSnakeFromArray(int leftSnakeX[], int leftSnakeY[], int &leftSnakeCount, int index);
+void deleteRightSnakeFromArray(int rightSnakeX[], int rightSnakeY[], int &rightSnakeCount, int index);
 void generateRightSnake(char snakeRight[4][3], int rightSnakeX[], int rightSnakeY[], int &rightSnakeCount, int rSnakeX, int rSnakeY);
 void moveBulletFromLeftCanon(int leftCanonBulletX[], int leftCanonBulletY[], int &leftCanonBulletCount, int mazeYMax, bool &isShieldActive, int &hit);
+void eraseLeftBulletFromArray(int leftCanonBulletX[], int leftCanonBulletY[], int &leftCanonBulletCount, int index);
 void moveBulletFromRightCanon(int rightCanonBulletX[], int rightCanonBulletY[], int &rightCanonBulletCount, int mazeYMax, bool &isShieldActive, int &hit);
+void eraseRightBulletFromArray(int rightCanonBulletX[], int rightCanonBulletY[], int &rightCanonBulletCount, int index);
 void generateBulletFromRightCanon(int rightCanonBulletX[], int rightCanonBulletY[], int &rightCanonBulletCount, int rightCanonX, int rightCanonY);
 void generateBulletFromLeftCanon(int leftCanonBulletX[], int leftCanonBulletY[], int &leftCanonBulletCount, int leftCanonX, int leftCanonY);
 void printStage(char stage[39][55]);
@@ -130,7 +134,7 @@ main() {
     // Canon Fire Coordinates
     int leftCanonBulletX[100];
     int leftCanonBulletY[100];
-    
+
     int leftCanonBulletCount = 0;
     int rightCanonBulletX[100];
     int rightCanonBulletY[100];
@@ -183,7 +187,7 @@ main() {
     loadStage(stage);
 
     system("cls");
-    loadingScreen(loadingPageCharacter);
+    // loadingScreen(loadingPageCharacter);
     int choice;
     while (1) {
         header();
@@ -283,6 +287,7 @@ main() {
                 if (GetAsyncKeyState(VK_SPACE)) {
                     // generateRightCoin(rightCoinX, rightCoinY, rightCoinCount, rCoinX, rCoinY);
                     generateLeftSnake(snakeLeft, leftSnakeX, leftSnakeY, leftSnakeCount, lSnakeX, lSnakeY);
+                    // generateBulletFromLeftCanon(leftCanonBulletX, leftCanonBulletY, leftCanonBulletCount, leftCanonX, leftCanonY);
                 }
                 if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
                     if (moveStatus == 'S') {
@@ -348,7 +353,6 @@ main() {
                 moveRightSnake(snakeRight, rightSnakeX, rightSnakeY, rightSnakeCount, isShieldActive, hit, mazeYMax);
                 moveLeftCoin(leftCoinX, leftCoinY, leftCoinCount, mazeYMax, score);
                 moveRightCoin(rightCoinX, rightCoinY, rightCoinCount, mazeYMax, score);
-                // collisionDetection();
                 //  gotoxy(60, 5);
                 //  cout << "Hits: " << hit;
                 gotoxy(60, 6);
@@ -513,6 +517,13 @@ void moveRightCoin(int rightCoinX[], int rightCoinY[], int &rightCoinCount, int 
         }
     }
 }
+void deleteRightSnakeFromArray(int rightSnakeX[], int rightSnakeY[], int &rightSnakeCount, int index) {
+    for (int j = index; j < rightSnakeCount - 1; j++) {
+        rightSnakeX[j] = rightSnakeX[j + 1];
+        rightSnakeY[j] = rightSnakeY[j + 1];
+    }
+    rightSnakeCount--;
+}
 void moveRightSnake(char snakeRight[4][3], int rightSnakeX[], int rightSnakeY[], int &rightSnakeCount, bool &isShieldActive, int &hit, int mazeYMax) {
     int i = 0;
     while (i < rightSnakeCount) {
@@ -523,20 +534,11 @@ void moveRightSnake(char snakeRight[4][3], int rightSnakeX[], int rightSnakeY[],
                 hit++;
             }
             eraseSnake(rightSnakeX[i], rightSnakeY[i]);
-            for (int j = i; j < rightSnakeCount - 1; j++) {
-                rightSnakeX[j] = rightSnakeX[j + 1];
-                rightSnakeY[j] = rightSnakeY[j + 1];
-            }
-            rightSnakeCount--;
+            deleteRightSnakeFromArray(rightSnakeX, rightSnakeY, rightSnakeCount, i);
         }
         else if (rightSnakeY[i] == mazeYMax) {
             eraseSnake(rightSnakeX[i], rightSnakeY[i]);
-            for (int j = i; j < rightSnakeCount - 1; j++) {
-                rightSnakeX[j] = rightSnakeX[j + 1];
-                rightSnakeY[j] = rightSnakeY[j + 1];
-            }
-            rightSnakeCount--;
-            // isRightSnakePresent = false;
+            deleteRightSnakeFromArray(rightSnakeX, rightSnakeY, rightSnakeCount, i);
         }
         else {
 
@@ -548,6 +550,13 @@ void moveRightSnake(char snakeRight[4][3], int rightSnakeX[], int rightSnakeY[],
         }
     }
 }
+void deleteLeftSnakeFromArray(int leftSnakeX[], int leftSnakeY[], int &leftSnakeCount, int index) {
+    for (int j = index; j < leftSnakeCount - 1; j++) {
+        leftSnakeX[j] = leftSnakeX[j + 1];
+        leftSnakeY[j] = leftSnakeY[j + 1];
+    }
+    leftSnakeCount--;
+}
 void moveLeftSnake(char snakeLeft[4][3], int leftSnakeX[], int leftSnakeY[], int &leftSnakeCount, bool &isShieldActive, int &hit, int mazeYMax) {
     int i = 0;
     while (i < leftSnakeCount) {
@@ -558,20 +567,11 @@ void moveLeftSnake(char snakeLeft[4][3], int leftSnakeX[], int leftSnakeY[], int
                 hit++;
             }
             eraseSnake(leftSnakeX[i], leftSnakeY[i]);
-            for (int j = i; j < leftSnakeCount - 1; j++) {
-                leftSnakeX[j] = leftSnakeX[j + 1];
-                leftSnakeY[j] = leftSnakeY[j + 1];
-            }
-            leftSnakeCount--;
+            deleteLeftSnakeFromArray(leftSnakeX, leftSnakeY, leftSnakeCount, i);
         }
         else if (leftSnakeY[i] == mazeYMax) {
             eraseSnake(leftSnakeX[i], leftSnakeY[i]);
-            for (int j = i; j < leftSnakeCount - 1; j++) {
-                leftSnakeX[j] = leftSnakeX[j + 1];
-                leftSnakeY[j] = leftSnakeY[j + 1];
-            }
-            leftSnakeCount--;
-            // isLeftSnakePresent = false;
+            deleteLeftSnakeFromArray(leftSnakeX, leftSnakeY, leftSnakeCount, i);
         }
         else {
 
@@ -650,6 +650,13 @@ void printLeftSnake(char snakeLeft[4][3], int x, int y) {
         y--;
     }
 }
+void eraseLeftBulletFromArray(int leftCanonBulletX[], int leftCanonBulletY[], int &leftCanonBulletCount, int index) {
+    for (int j = index; j < leftCanonBulletCount - 1; j++) {
+        leftCanonBulletX[j] = leftCanonBulletX[j + 1];
+        leftCanonBulletY[j] = leftCanonBulletY[j + 1];
+    }
+    leftCanonBulletCount--;
+}
 void moveBulletFromLeftCanon(int leftCanonBulletX[], int leftCanonBulletY[], int &leftCanonBulletCount, int mazeYMax, bool &isShieldActive, int &hit) {
     int i = 0;
     while (i < leftCanonBulletCount) {
@@ -660,22 +667,12 @@ void moveBulletFromLeftCanon(int leftCanonBulletX[], int leftCanonBulletY[], int
                 hit++;
             }
             eraseBulletOfCanon(leftCanonBulletX[i], leftCanonBulletY[i]);
-            for (int j = i; j < leftCanonBulletCount - 1; j++) {
-                leftCanonBulletX[j] = leftCanonBulletX[j + 1];
-                leftCanonBulletY[j] = leftCanonBulletY[j + 1];
-            }
-            leftCanonBulletCount--;
+            eraseLeftBulletFromArray(leftCanonBulletX, leftCanonBulletY, leftCanonBulletCount, i);
         }
 
         if (leftCanonBulletY[i] == mazeYMax) {
             eraseBulletOfCanon(leftCanonBulletX[i], leftCanonBulletY[i]);
-            for (int j = i; j < leftCanonBulletCount - 1; j++) {
-                leftCanonBulletX[j] = leftCanonBulletX[j + 1];
-                leftCanonBulletY[j] = leftCanonBulletY[j + 1];
-            }
-            leftCanonBulletCount--;
-            // eraseLeftCanon();
-            // isLeftCanonPresent = false;
+            eraseLeftBulletFromArray(leftCanonBulletX, leftCanonBulletY, leftCanonBulletCount, i);
         }
         else {
             eraseBulletOfCanon(leftCanonBulletX[i], leftCanonBulletY[i]);
@@ -685,6 +682,13 @@ void moveBulletFromLeftCanon(int leftCanonBulletX[], int leftCanonBulletY[], int
             i++;
         }
     }
+}
+void eraseRightBulletFromArray(int rightCanonBulletX[], int rightCanonBulletY[], int &rightCanonBulletCount, int index) {
+    for (int j = index; j < rightCanonBulletCount - 1; j++) {
+        rightCanonBulletX[j] = rightCanonBulletX[j + 1];
+        rightCanonBulletY[j] = rightCanonBulletY[j + 1];
+    }
+    rightCanonBulletCount--;
 }
 void moveBulletFromRightCanon(int rightCanonBulletX[], int rightCanonBulletY[], int &rightCanonBulletCount, int mazeYMax, bool &isShieldActive, int &hit) {
     int i = 0;
@@ -696,19 +700,11 @@ void moveBulletFromRightCanon(int rightCanonBulletX[], int rightCanonBulletY[], 
                 hit++;
             }
             eraseBulletOfCanon(rightCanonBulletX[i], rightCanonBulletY[i]);
-            for (int j = i; j < rightCanonBulletCount - 1; j++) {
-                rightCanonBulletX[j] = rightCanonBulletX[j + 1];
-                rightCanonBulletY[j] = rightCanonBulletY[j + 1];
-            }
-            rightCanonBulletCount--;
+            eraseRightBulletFromArray(rightCanonBulletX, rightCanonBulletY, rightCanonBulletCount, i);
         }
         else if (rightCanonBulletY[i] == mazeYMax) {
             eraseBulletOfCanon(rightCanonBulletX[i], rightCanonBulletY[i]);
-            for (int j = i; j < rightCanonBulletCount - 1; j++) {
-                rightCanonBulletX[j] = rightCanonBulletX[j + 1];
-                rightCanonBulletY[j] = rightCanonBulletY[j + 1];
-            }
-            rightCanonBulletCount--;
+            eraseRightBulletFromArray(rightCanonBulletX, rightCanonBulletY, rightCanonBulletCount, i);
         }
 
         else {
@@ -882,7 +878,7 @@ void printStage(char stage[39][55]) {
         for (int col = 0; col < 54; col++) {
             cout << stage[row][col];
         }
-        Sleep(100);
+        // Sleep(100);
         cout << endl;
     }
 }
